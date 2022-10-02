@@ -20,8 +20,31 @@ public class IOUtilService {
 	public IOUtilService() {
 		processor = new ProcessorService();
 	}
+	
+	public void startProcess() {
+		try {
+			File inputFile = getFileFromUser();
+			List<OrderDetails> orderDetails = extractOrderDetails(inputFile);
+			writeAverageQuantityFile(inputFile, orderDetails);
+			writePopularBrandFile(inputFile, orderDetails);
 
-	public File getFileFromUser() throws IOException {
+		} catch (Exception e) {
+			log.error("Exception occured ", e);
+		}
+	}
+
+	public static List<OrderDetails> extractOrderDetails(File inputFile) throws IOException {
+
+		try {
+			CsvFileReader reader = new CsvFileReader();
+			return reader.readFileData(inputFile);
+		} catch (IOException e) {
+			log.error("Exception occured while reading data from user provded file ", e);
+			throw e;
+		}
+	}
+
+	public static File getFileFromUser() throws IOException {
 
 		try (Scanner scanner = new Scanner(System.in);) {
 			System.out.println("---> Please provide the input CSV file path : ");
