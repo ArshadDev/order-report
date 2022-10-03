@@ -9,21 +9,20 @@ import org.apache.log4j.Logger;
 
 import com.opencsv.bean.CsvToBeanBuilder;
 
-import model.OrderDetails;
-
-public class CsvFileReader implements CustomFileReader {
+public class CsvFileReader<T> implements CustomFileReader<T> {
 	static Logger log = Logger.getLogger(CsvFileReader.class.getName());
 
-	public List<OrderDetails> readFileData(File fileToRead) throws IOException {
+	
 
-		try (FileReader fileReader = new FileReader(fileToRead);) {
-			List<OrderDetails> orderDetails = new CsvToBeanBuilder<OrderDetails>(fileReader)
-					.withType(OrderDetails.class).build().parse();
+	public List<T> readFileData(File fileToRead, Class<T> type) throws IOException {
 
-			log.info("Read " + (orderDetails != null ? orderDetails.size() : 0) + " records from user provided file ("
+		try (FileReader fileReader = new FileReader(fileToRead);) {			
+			List<T> data = new CsvToBeanBuilder<T>(fileReader).withType(type).build().parse();
+
+			log.info("Read " + (data != null ? data.size() : 0) + " records from user provided file ("
 					+ fileToRead.getAbsolutePath() + ") ");
 
-			return orderDetails;
+			return data;
 		} catch (Exception e) {
 			log.error("Exception occured while reading data from file (" + fileToRead.getAbsolutePath() + ") ", e);
 			throw e;

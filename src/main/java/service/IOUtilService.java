@@ -20,10 +20,9 @@ public class IOUtilService {
 	public IOUtilService() {
 		processor = new ProcessorService();
 	}
-	
-	public void startProcess() {
+
+	public void startProcess(File inputFile) {
 		try {
-			File inputFile = getFileFromUser();
 			List<OrderDetails> orderDetails = extractOrderDetails(inputFile);
 			writeAverageQuantityFile(inputFile, orderDetails);
 			writePopularBrandFile(inputFile, orderDetails);
@@ -36,15 +35,15 @@ public class IOUtilService {
 	public static List<OrderDetails> extractOrderDetails(File inputFile) throws IOException {
 
 		try {
-			CsvFileReader reader = new CsvFileReader();
-			return reader.readFileData(inputFile);
+			CsvFileReader<OrderDetails> reader = new CsvFileReader<OrderDetails>();
+			return reader.readFileData(inputFile, OrderDetails.class);
 		} catch (IOException e) {
 			log.error("Exception occured while reading data from user provded file ", e);
 			throw e;
 		}
 	}
 
-	public static File getFileFromUser() throws IOException {
+	public File getFileFromUser() throws IOException {
 
 		try (Scanner scanner = new Scanner(System.in);) {
 			System.out.println("---> Please provide the input CSV file path : ");
@@ -61,9 +60,10 @@ public class IOUtilService {
 		}
 	}
 
-	public File createFileWithPrefix(String prefix, File inputFile) {
+	public static File createFileWithPrefix(String prefix, File inputFile) {
 		String newFileName = prefix + "_" + inputFile.getName();
-		String newFilePath = inputFile.getAbsolutePath().replace(inputFile.getName(), newFileName);
+		String parentFolderPath = inputFile.getParent();
+		String newFilePath = parentFolderPath + "\\" + newFileName;
 		File newFile = new File(newFilePath);
 		return newFile;
 	}
